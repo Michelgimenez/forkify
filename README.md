@@ -1,3 +1,3 @@
-# forkify Project
+# gamify aplicacion de video juegos
 
-Recipe application with custom recipe uploads.
+Aplicacion para buscar videojuegos

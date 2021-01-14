@@ -1,8 +1,7 @@
+import View from './View.js';
 // import icons from '../img/icons.svg'; // Parcel 1
 // Parcel 2, para archivos estaticos como imagenes, videos, etc. Esto me da basicamente el url que me da parcel del nuevo archivo de los iconos dentro de dist
 import icons from 'url:../../img/icons.svg';
-import Fraction from 'fractional';
-import View from './View.js';
 
 class RecipeView extends View {
   _parentElement = document.querySelector('.recipe');
@@ -22,7 +21,15 @@ class RecipeView extends View {
     });
   }
 
-  _generateMarkup() {
+  addHandlerAddBookmark(handler) {
+    this._parentElement.addEventListener('click', function (e) {
+      const btn = e.target.closest('.btn--bookmark');
+      if (!btn) return;
+      handler();
+    });
+  }
+
+  _generateMarkUp() {
     return `
     <figure class="recipe__fig">
           <img src="${this._data.image}" alt="${
@@ -35,99 +42,109 @@ class RecipeView extends View {
 
         <div class="recipe__details">
           <div class="recipe__info">
-            <svg class="recipe__info-icon">
-              <use href="${icons}#icon-clock"></use>
-            </svg>
+            
+            <ion-icon name="calendar-outline" class="recipe__info-icon md hydrated"></ion-icon>
             <span class="recipe__info-data recipe__info-data--minutes">${
-              this._data.cookingTime
+              this._data.released
             }</span>
-            <span class="recipe__info-text">minutes</span>
           </div>
           <div class="recipe__info">
-            <svg class="recipe__info-icon">
-              <use href="${icons}#icon-users"></use>
-            </svg>
+          <ion-icon name="star-outline" class="recipe__info-icon md hydrated"></ion-icon>
             <span class="recipe__info-data recipe__info-data--people">${
-              this._data.servings
-            }</span>
-            <span class="recipe__info-text">servings</span>
-
-            <div class="recipe__info-buttons">
-              <button class="btn--tiny btn--increase-servings">
-                <svg>
-                  <use href="${icons}#icon-minus-circle"></use>
-                </svg>
-              </button>
-              <button class="btn--tiny btn--increase-servings">
-                <svg>
-                  <use href="${icons}#icon-plus-circle"></use>
-                </svg>
-              </button>
-            </div>
+              this._data.rating
+            }</span> 
           </div>
-
-          <div class="recipe__user-generated">
-            
+          <div class="recipe__info">
+          <ion-icon name="business-outline" class="recipe__info-icon md hydrated"></ion-icon>
+            <span class="recipe__info-data recipe__info-data--people">${
+              this._data.developers[0].name
+            }</span> 
           </div>
-          <button class="btn--round">
+          <div class="recipe__info">
+          <ion-icon name="game-controller-outline" class="recipe__info-icon md hydrated"></ion-icon>
+            <span class="recipe__info-data recipe__info-data--people">${this._data.genres
+              .map(genre => {
+                return genre.name;
+              })
+              .join(', ')}</span> 
+          </div>
+          <button class="btn--round btn--bookmark">
             <svg class="">
-              <use href="${icons}#icon-bookmark-fill"></use>
+              <use href="${icons}#icon-bookmark${
+      this._data.bookmarked ? '-fill' : ''
+    }"></use>
             </svg>
           </button>
         </div>
 
         
         <div class="recipe__ingredients">
-          <h2 class="heading--2">Recipe ingredients</h2>
+          <h2 class="heading--2">
+          <ion-icon name="document-text-outline"></ion-icon>
+          Descripcion</h2>
           <ul class="recipe__ingredient-list">
             ${
-              // Aca lo que hago es usar join, ya que map crea un nuevo array, y en este caso seria un array con multiples template strings, y yo quiero convertirlo en un solo string, asi que uno todas las trings con los LI, en una sola string usando JOIN, y uniendo sin espacios con ''
-              this._data.ingredients
-                .map(this._generateMarkUpIngredients)
-                .join('')
+              this._data.description
+                ? this._data.description
+                : '<h2> No pudimos encontrar una descripcion de este videojuego</h2>'
             }   
+            
           </ul>
         </div>
 
+        <div class="line"> </div>
+
+        <div class="recipe__images">
+          <h2 class="heading--2">
+          <ion-icon name="images-outline"></ion-icon>
+          Imagenes</h2>
+          <ul class="recipe__images-list">
+           ${this._data.images
+             .map(image => {
+               return `<img src=${image.image} class="recipe__images-list-image"> </img>`;
+             })
+             .join('')}
+          </ul>
+        </div>
+
+        <div class="line"> </div>
+
+        <div class="recipe__video">
+          <h2 class="heading--2">
+          <ion-icon name="videocam-outline"></ion-icon>
+          Video</h2>
+          ${
+            this._data.video
+              ? `<video class="recipe__video-view" autoplay muted loop controls>
+          <source src=${this._data.video}></source>`
+              : 'Este juego no tiene video'
+          }
+          </video>
+        </div>
+
+        <div class="line"> </div>
+
         <div class="recipe__directions">
-          <h2 class="heading--2">How to cook it</h2>
-          <p class="recipe__directions-text">
-            This recipe was carefully designed and tested by
-            <span class="recipe__publisher">${
-              this._data.publisher
-            }</span>. Please check out
-            directions at their website.
-          </p>
-          <a
+          <h2 class="heading--2">Donde comprar el juego</h2>
+          <div class="recipe__directions-stores">
+          ${
+            this._data.stores.length !== 0
+              ? this._data.stores
+                  .map(store => {
+                    return `<a
             class="btn--small recipe__btn"
-            href="${this._data.sourceUrl}"
+            href="${store.url}"
             target="_blank"
           >
-            <span>Directions</span>
-            <svg class="search__icon">
-              <use href="${icons}#icon-arrow-right"></use>
-            </svg>
-          </a>
-        </div>
-    `;
-  }
+            <span>${store.store.name}</span>
 
-  _generateMarkUpIngredients(ingredient) {
-    return `
-    <li class="recipe__ingredient">
-    <svg class="recipe__icon">
-      <use href="${icons}#icon-check"></use>
-    </svg>
-    <div class="recipe__quantity">${
-      ingredient.quantity
-        ? new Fraction.Fraction(ingredient.quantity).toString()
-        : ''
-    }</div>
-    <div class="recipe__description">
-      <span class="recipe__unit">${ingredient.unit}</span>
-      ${ingredient.description}
-    </div>
-  </li>
+          </a>`;
+                  })
+                  .join('')
+              : '<h2> No pudimos encontrar una tienda que venda este videojuego</h2>'
+          }
+          </div>
+        </div>
     `;
   }
 }

@@ -16,7 +16,7 @@ class PaginationView extends View {
   }
 
   // Para obtener la cantidad de resultados por pagina, simplemente divido la cantidad de recetas encontradas en la busqueda, que para recibir en numero, utilizo length, asi recibo la cantidad de recetas en el arrat de results, y divido por la cantidad de resultados que quiero por pagina, por ejemplo 47 resultados dividido 10, seria 4.7, y para redondear en 5, uso math.ceil
-  _generateMarkup() {
+  _generateMarkUp() {
     const currentPage = this._data.page;
 
     const numPages = Math.ceil(
@@ -28,7 +28,7 @@ class PaginationView extends View {
         <button data-goto="${
           currentPage + 1
         }" class="btn--inline pagination__btn--next">
-            <span>Page ${currentPage + 1}</span>
+            <span>Pagina ${currentPage + 1}</span>
             <svg class="search__icon">
               <use href="${icons}#icon-arrow-right"></use>
             </svg>
